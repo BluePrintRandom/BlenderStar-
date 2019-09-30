@@ -1,6 +1,6 @@
 import bge, bpy
 import mathutils
-
+from mathutils import Vector
 import heapq
 
 cont = bge.logic.getCurrentController()
@@ -117,32 +117,49 @@ def main():
             index+=1
         kd.balance()
         own['Kd']=kd
+        own['requests']=[]
              
             
                                     
             
     else:
-        player = own.scene.objects['Actor']
-        end = own.scene.objects['Target'] 
+        if len(own['requests'])>0:
+            request = own['requests'][0]
+            if type(request[0]) is Vector:
+                start = own['Kd'].find(request[0])[1]
+            elif type(request[0]) is bge.types.KX_GameObject:
+                start =  own['Kd'].find(request[0].worldPosition )[1]
+                
+                
+            if type(request[1]) is Vector:
+                end = own['Kd'].find(request[1])[1]
+            elif type(request[1]) is bge.types.KX_GameObject:
+                end =  own['Kd'].find(request[1].worldPosition )[1]    
+                
+            
         
-        start = own['Kd'].find(player.worldPosition)[1]
-        end = own['Kd'].find(end.worldPosition)[1]
         
-        print('start is'+str(start) +" and end is "+str(end))
-        path = a_star_search(own['Graph'],start,end)         
+       
         
-        truePath = reconstruct_path(path[0], start,end)
-        index = 0
-        print(truePath)
-        for point in truePath:
-            if index!=0:
-                added = own.scene.addObject('Line',own,1)
-                added.worldPosition = own['locations'][point]
-                p2 = own['locations'][truePath[index-1]]
-                v2 = added.getVectTo(p2)
-                added.alignAxisToVect(v2[1],1,1)
-                added.localScale = [1,v2[0],1]
-            index+=1    
+            #print('start is'+str(start) +" and end is "+str(end))
+            path = a_star_search(own['Graph'],start,end)         
+            
+            truePath = reconstruct_path(path[0], start,end)
+            index = 0
+            print(truePath)
+            for point in truePath:
+                if index!=0:
+                    added = own.scene.addObject('Line',own,1)
+                    added.worldPosition = own['locations'][point]
+                    p2 = own['locations'][truePath[index-1]]
+                    v2 = added.getVectTo(p2)
+                    added.alignAxisToVect(v2[1],1,1)
+                    added.localScale = [1,v2[0],1]
+                index+=1   
+            own['requests'][0][2]['path'] = truePath
+            own['requests'].pop(0)
+            print('sent')
+                 
                 
                 
 main()
