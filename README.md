@@ -10,3 +10,8 @@ this is used to find the players start / end nodes.
 it then uses the graph to pathfind
 
 Enjoy!
+
+based on 
+
+https://www.redblobgames.com/pathfinding/a-star/implementation.html
+
